@@ -5,6 +5,10 @@ import cv2
 import json
 import numpy as np
 import time
+import math
+
+def assert_nonzero(a):
+    return 0.0000001 if not a else a
 
 def main():
 
@@ -56,26 +60,28 @@ def main():
       dis_list = []
       obj = 0
 
-      for contour in contour_list:
+      for contour in contour_list: 
          obj += 1
 
          # Ignore small contours that could be because of noise/bad thresholding
          # if cv2.contourArea(contour) < 15:
          #  continue
 
-            # draws a countour around the remaining areas
+            # draws a countour around  the remaining areas
          cv2.drawContours(output_img, contour, -1, color = (255, 255, 255), thickness = -1)
 
             # draws the smallest possible rectangle around the contour area
          rect = cv2.minAreaRect(contour)
          center, size, angle = rect
 
+         center_2 = center
+
          # gets the x and y dimentions and adds them to the contours
-         center_2 = tuple([int(dim) for dim in center]) # Convert to int so we can draw
+         # center_2 = tuple([int(dim) for dim in center]) # Convert to int so we can draw
 
          # Draw rectangle and circle
          cv2.drawContours(output_img, [cv2.boxPoints(rect).astype(int)], -1, color = (255, 0, 0), thickness = 2)
-         cv2.circle(output_img, center = center, radius = 3, color = (255, 0, 0), thickness = -1)
+         # cv2.circle(output_img, center = center, radius = 3, color = (255, 0, 0), thickness = -1)
 
          x_list.append((center_2[0] - width / 2) / (width / 2))
          y_list.append((center_2[1] - height / 2) / (height / 2))
@@ -84,12 +90,12 @@ def main():
       # vision_nt.putNumberArray('target_x', x_list)
       # vision_nt.putNumberArray('target_y', y_list)
 
-    # how todo this
-
-    # I think the best option is to pass x and y coords 
-
       if x_list:
-          print(f"move in x:c {sorted(x_list)[len(x_list)//2]}, height of thing: {dis_list} objects found : {obj}") #  move in y {sorted(y_list)[len(y_list)//2]}
+          target_width = 5.75
+          # print(dis_list)
+          dist = float(((width/2)*target_width)/assert_nonzero(sorted(dis_list[0])[1]))/assert_nonzero(math.tan(25.6))
+          # height of thing: {dis_list}
+          print(f"move in x:c {sorted(x_list)[len(x_list)//2]} objects found : {obj}, new dist val: {dist}") #  move in y {sorted(y_list)[len(y_list)//2]}
            
       processing_time = time.time() - start_time
       fps = 1 / processing_time
