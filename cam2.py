@@ -22,7 +22,10 @@ def filter_list(big_list):
    filteredlist = []
    for item in big_list:
       if(item[0][0]/item[0][1]<3.25 and item[0][0]/item[0][1]>2.25 and big_list[2]<10):
-         
+         pass
+   
+
+
    
 
 def main():
