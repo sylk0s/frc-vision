@@ -10,6 +10,21 @@ import math
 def assert_nonzero(a):
     return 0.0000001 if not a else a
 
+
+#ANGLE HAS TO BE IN RADIANS
+def find_dist(x1, x2, camera_fov):
+   rel_dist = abs(x1-x2)/2
+   angle = rel_dist*camera_fov
+   strip_center_dist = 5.5+5
+   return strip_center_dist/(math.tan(angle/2))
+
+def filter_list(big_list):
+   filteredlist = []
+   for item in big_list:
+      if(item[0][0]/item[0][1]<3.25 and item[0][0]/item[0][1]>2.25 and big_list[2]<10):
+         
+   
+
 def main():
 
     # loads configs
@@ -38,6 +53,9 @@ def main():
    # Wait for NetworkTables to start
    time.sleep(0.5)
 
+   
+
+
    while True:
       start_time = time.time()
 
@@ -58,14 +76,15 @@ def main():
       x_list = []
       y_list = []
       dis_list = []
+      other_list = []
       obj = 0
 
       for contour in contour_list: 
          obj += 1
 
          # Ignore small contours that could be because of noise/bad thresholding
-         # if cv2.contourArea(contour) < 15:
-         #  continue
+         if cv2.contourArea(contour) < 15:
+           continue
 
             # draws a countour around  the remaining areas
          cv2.drawContours(output_img, contour, -1, color = (255, 255, 255), thickness = -1)
@@ -73,7 +92,7 @@ def main():
             # draws the smallest possible rectangle around the contour area
          rect = cv2.minAreaRect(contour)
          center, size, angle = rect
-
+         
          center_2 = center
 
          # gets the x and y dimentions and adds them to the contours
@@ -86,6 +105,7 @@ def main():
          x_list.append((center_2[0] - width / 2) / (width / 2))
          y_list.append((center_2[1] - height / 2) / (height / 2))
          dis_list.append(size)
+         other_list.append([size, angle, (center_2[0] - width / 2) / (width / 2)])
 
       # vision_nt.putNumberArray('target_x', x_list)
       # vision_nt.putNumberArray('target_y', y_list)
